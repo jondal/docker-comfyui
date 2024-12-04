@@ -3,6 +3,7 @@
 set -Eeuo pipefail
 
 mkdir -vp /data/config/comfy/custom_nodes
+mkdir -vp /data/user/default/workflows
 
 declare -A MOUNTS
 
