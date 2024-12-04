@@ -1,0 +1,10 @@
+/.devcontainer
+/docker-compose.override.yml
+
+# VSCode specific
+*.code-workspace
+/.vscode
+
+PixArt-XL-2-1024-MS
+*.safetensors
+*.ckpt
