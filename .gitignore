@@ -8,3 +8,4 @@
 PixArt-XL-2-1024-MS
 *.safetensors
 *.ckpt
+.cache
