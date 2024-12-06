@@ -3,13 +3,13 @@
 set -Eeuo pipefail
 
 mkdir -vp /data/config/comfy/custom_nodes
-mkdir -vp /data/user/default/workflows
+#mkdir -vp /data/user/default/workflows
 
 declare -A MOUNTS
 
 MOUNTS["/root/.cache"]="/data/.cache"
 MOUNTS["${ROOT}/input"]="/data/config/comfy/input"
-MOUNTS["${ROOT}/output"]="/output/comfy"
+#MOUNTS["${ROOT}/output"]="/output/comfy"
 
 for to_path in "${!MOUNTS[@]}"; do
   set -Eeuo pipefail
@@ -31,6 +31,10 @@ for dir in /data/config/comfy/custom_nodes/*/; do
  fi
 done
 
+# copy workflows
+#cp /data/user/default/workflows/* "${ROOT}/user/default/workflows/"
+
+# startup
 if [ -f "/data/config/comfy/startup.sh" ]; then
   pushd ${ROOT}
   . /data/config/comfy/startup.sh

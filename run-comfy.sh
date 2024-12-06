@@ -1,1 +1,1 @@
-docker compose --profile comfy up
+sudo docker compose --profile comfy up

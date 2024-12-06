@@ -28,7 +28,7 @@ a111:
 comfyui:
   base_path: /data
 
-  workflows: user/default/workflows/
+  #workflows: user/default/workflows/
   custom_nodes: config/comfy/custom_nodes
   clip: models/clip/
   clip_vision: models/clip_vision/

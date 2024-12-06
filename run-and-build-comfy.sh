@@ -1,1 +1,1 @@
-docker compose --profile comfy up --build
+sudo docker compose --profile comfy up --build --force-recreate

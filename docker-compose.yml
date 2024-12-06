@@ -3,7 +3,15 @@ x-base_service: &base_service
       - "${WEBUI_PORT:-7860}:7860"
     volumes:
       - &v1 ./data:/data
-      - &v2 ./output:/output
+      - type: tmpfs
+        target: /stable-diffusion/temp
+        tmpfs:
+          size: "12884901888"
+      - type: tmpfs
+        target: /stable-diffusion/output
+        tmpfs:
+          size: "12884901888"
+      #- &v2 ./output:/output
     stop_signal: SIGKILL
     tty: true
     deploy:
@@ -17,26 +25,26 @@ x-base_service: &base_service
 name: webui-docker
 
 services:
-  download:
-    build: ./services/download/
-    profiles: ["download"]
-    volumes:
-      - *v1
+  # download:
+  #   build: ./services/download/
+  #   profiles: ["download"]
+  #   volumes:
+  #     - *v1
 
-  auto: &automatic
-    <<: *base_service
-    profiles: ["auto"]
-    build: ./services/AUTOMATIC1111
-    image: sd-auto:78
-    environment:
-      - CLI_ARGS=--allow-code --medvram --xformers --enable-insecure-extension-access --api
+  # auto: &automatic
+  #   <<: *base_service
+  #   profiles: ["auto"]
+  #   build: ./services/AUTOMATIC1111
+  #   image: sd-auto:78
+  #   environment:
+  #     - CLI_ARGS=--allow-code --medvram --xformers --enable-insecure-extension-access --api
 
-  auto-cpu:
-    <<: *automatic
-    profiles: ["auto-cpu"]
-    deploy: {}
-    environment:
-      - CLI_ARGS=--no-half --precision full --allow-code --enable-insecure-extension-access --api
+  # auto-cpu:
+  #   <<: *automatic
+  #   profiles: ["auto-cpu"]
+  #   deploy: {}
+  #   environment:
+  #     - CLI_ARGS=--no-half --precision full --allow-code --enable-insecure-extension-access --api
 
   comfy: &comfy
     <<: *base_service
@@ -46,10 +54,9 @@ services:
     environment:
       - CLI_ARGS=
 
-
-  comfy-cpu:
-    <<: *comfy
-    profiles: ["comfy-cpu"]
-    deploy: {}
-    environment:
-      - CLI_ARGS=--cpu
+  # comfy-cpu:
+  #   <<: *comfy
+  #   profiles: ["comfy-cpu"]
+  #   deploy: {}
+  #   environment:
+  #     - CLI_ARGS=--cpu
