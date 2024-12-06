@@ -2,7 +2,9 @@ x-base_service: &base_service
     ports:
       - "${WEBUI_PORT:-7860}:7860"
     volumes:
-      - &v1 ./data:/data
+      # volume 1 is read only (:ro)
+      - &v1 ./data:/data:ro
+      # temp fs
       - type: tmpfs
         target: /stable-diffusion/temp
         tmpfs:

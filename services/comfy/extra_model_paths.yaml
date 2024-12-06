@@ -16,7 +16,7 @@ a111:
   clip: models/CLIPEncoder
   embeddings: embeddings
 
-  custom_nodes: config/comfy/custom_nodes
+  #custom_nodes: config/comfy/custom_nodes
 
   # TODO: I am unsure about these, need more testing
   # style_models: config/comfy/style_models
@@ -29,7 +29,7 @@ comfyui:
   base_path: /data
 
   #workflows: user/default/workflows/
-  custom_nodes: config/comfy/custom_nodes
+  #custom_nodes: config/comfy/custom_nodes
   clip: models/clip/
   clip_vision: models/clip_vision/
   diffusion_models: |
@@ -37,6 +37,5 @@ comfyui:
     models/unet
   loras: models/loras/
   vae: models/vae/
-  #LTXVideo
   checkpoints: models/checkpoints/
   text_encoders: models/text_encoders/
