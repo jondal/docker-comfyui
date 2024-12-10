@@ -30,15 +30,21 @@ RUN chmod u+x /docker/entrypoint.sh && cp /docker/extra_model_paths.yaml ${ROOT}
 
 ENV NVIDIA_VISIBLE_DEVICES=all PYTHONPATH="${PYTHONPATH}:${PWD}" CLI_ARGS=""
 EXPOSE 7860
-#ENTRYPOINT ["/docker/entrypoint.sh"]
+ENTRYPOINT ["/docker/entrypoint.sh"]
 
 # Workflows
 COPY workflows/*.json /stable-diffusion/user/default/workflows/
 
 # Custom nodes
 COPY ./custom_nodes/. /stable-diffusion/custom_nodes/
+RUN pip install -r /stable-diffusion/custom_nodes/ComfyUI-KJNodes/requirements.txt
+RUN pip install -r /stable-diffusion/custom_nodes/ComfyUI-CogVideoXWrapper/requirements.txt
 RUN pip install -r /stable-diffusion/custom_nodes/ComfyUI-LTXVideo/requirements.txt
 RUN pip install -r /stable-diffusion/custom_nodes/ComfyUI-VideoHelperSuite/requirements.txt
+RUN pip install -r /stable-diffusion/custom_nodes/ComfyUI-HunyuanVideoWrapper/requirements.txt
+
+# CogVideoX (needs to be copied)
+#COPY ./CogVideo/. /stable-diffusion/models/CogVideo/
 
 # Run
 CMD python -u main.py --listen --port 7860 ${CLI_ARGS}

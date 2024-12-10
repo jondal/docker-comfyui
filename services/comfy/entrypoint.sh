@@ -2,6 +2,15 @@
 
 set -Eeuo pipefail
 
+mkdir -vp /stable-diffusion/models/clip/clip-vit-large-patch14
+mkdir -vp /stable-diffusion/models/LLM/llava-llama-3-8b-text-encoder-tokenizer
+
+#ln -sf /data/models/clip/clip-vit-large-patch14 /stable-diffusion/models/clip/
+#ln -sf /data/models/LLM/llava-llama-3-8b-text-encoder-tokenizer /stable-diffusion/models/LLM/
+
+#cp -r /data/models/clip/clip-vit-large-patch14 /stable-diffusion/models/clip/
+#cp -r /data/models/LLM/llava-llama-3-8b-text-encoder-tokenizer /stable-diffusion/models/LLM/
+
 #mkdir -vp /data/config/comfy/custom_nodes
 #mkdir -vp /data/user/default/workflows
 
