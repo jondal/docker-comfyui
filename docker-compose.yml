@@ -5,7 +5,8 @@ x-base_service: &base_service
       # volume 1 is read only (:ro)
       - &v1 ./data:/data:ro
       - &v2 ./data/models/clip/clip-vit-large-patch14:/stable-diffusion/models/clip/clip-vit-large-patch14:ro
-      - &v3 ./data/models/LLM/llava-llama-3-8b-text-encoder-tokenizer:/stable-diffusion/models/LLM/llava-llama-3-8b-text-encoder-tokenizer:ro
+      - &v3 ./data/models/LLM:/stable-diffusion/models/LLM:ro
+      #- &v3 ./data/models/LLM/llava-llama-3-8b-text-encoder-tokenizer:/stable-diffusion/models/LLM/llava-llama-3-8b-text-encoder-tokenizer:ro
       # temp fs
       - type: tmpfs
         target: /stable-diffusion/temp
@@ -61,6 +62,7 @@ services:
     profiles: ["comfy"]
     build: ./services/comfy/
     image: sd-comfy:7
+    attach: false
     environment:
       - CLI_ARGS=
 

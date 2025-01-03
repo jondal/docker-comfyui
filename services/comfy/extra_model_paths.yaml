@@ -40,4 +40,4 @@ comfyui:
   checkpoints: models/checkpoints/
   text_encoders: models/text_encoders/
   CogVideo: models/CogVideo
-  LLM: models/LLM
+  LLM: models/LLM/

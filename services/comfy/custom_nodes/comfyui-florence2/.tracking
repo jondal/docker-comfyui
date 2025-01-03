@@ -1,0 +1,9 @@
+requirements.txt
+.gitattributes
+LICENSE
+.gitignore
+nodes.py
+pyproject.toml
+__init__.py
+README.md
+.github/workflows/publish.yaml
