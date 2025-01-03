@@ -6,6 +6,7 @@
 /.vscode
 
 PixArt-XL-2-1024-MS
+Florence-2-base
 *.safetensors
 *.ckpt
 .cache
