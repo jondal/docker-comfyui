@@ -37,6 +37,7 @@ COPY workflows/*.json /stable-diffusion/user/default/workflows/
 
 # Custom nodes
 COPY ./custom_nodes/. /stable-diffusion/custom_nodes/
+RUN pip install -r /stable-diffusion/custom_nodes/ComfyUI-Manager/requirements.txt
 RUN pip install -r /stable-diffusion/custom_nodes/comfy-image-saver/requirements.txt
 RUN pip install -r /stable-diffusion/custom_nodes/ComfyUI-KJNodes/requirements.txt
 RUN pip install -r /stable-diffusion/custom_nodes/ComfyUI-CogVideoXWrapper/requirements.txt
@@ -50,7 +51,7 @@ RUN pip install -r /stable-diffusion/custom_nodes/comfyui-florence2/requirements
 RUN pip install -r /stable-diffusion/custom_nodes/comfyui-tensorops/requirements.txt
 
 # Custom Python stuff
-RUN pip install GitPython
+#RUN pip install GitPython
 
 # CogVideoX (needs to be copied)
 #COPY ./CogVideo/. /stable-diffusion/models/CogVideo/

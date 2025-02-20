@@ -1,56 +1,7 @@
 {
-  "last_node_id": 72,
-  "last_link_id": 108,
+  "last_node_id": 73,
+  "last_link_id": 112,
   "nodes": [
-    {
-      "id": 6,
-      "type": "CLIPTextEncode",
-      "pos": [
-        424.71875,
-        618.052001953125
-      ],
-      "size": [
-        210,
-        54
-      ],
-      "flags": {
-        "collapsed": false
-      },
-      "order": 12,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "clip",
-          "type": "CLIP",
-          "link": 108
-        },
-        {
-          "name": "text",
-          "type": "STRING",
-          "link": 47,
-          "slot_index": 1,
-          "widget": {
-            "name": "text"
-          }
-        }
-      ],
-      "outputs": [
-        {
-          "name": "CONDITIONING",
-          "type": "CONDITIONING",
-          "links": [
-            86
-          ],
-          "slot_index": 0
-        }
-      ],
-      "properties": {
-        "Node name for S&R": "CLIPTextEncode"
-      },
-      "widgets_values": [
-        ""
-      ]
-    },
     {
       "id": 5,
       "type": "EmptyLatentImage",
@@ -326,13 +277,13 @@
         122
       ],
       "flags": {},
-      "order": 13,
+      "order": 12,
       "mode": 0,
       "inputs": [
         {
           "name": "model",
           "type": "MODEL",
-          "link": 106
+          "link": 110
         },
         {
           "name": "width",
@@ -385,7 +336,7 @@
         58
       ],
       "flags": {},
-      "order": 14,
+      "order": 15,
       "mode": 0,
       "inputs": [
         {
@@ -480,7 +431,7 @@
         106
       ],
       "flags": {},
-      "order": 15,
+      "order": 14,
       "mode": 0,
       "inputs": [
         {
@@ -562,7 +513,7 @@
           "name": "CLIP",
           "type": "CLIP",
           "links": [
-            108
+            111
           ],
           "slot_index": 0,
           "shape": 3
@@ -648,40 +599,6 @@
       ]
     },
     {
-      "id": 12,
-      "type": "UNETLoader",
-      "pos": [
-        18,
-        84
-      ],
-      "size": [
-        315,
-        82
-      ],
-      "flags": {},
-      "order": 7,
-      "mode": 0,
-      "inputs": [],
-      "outputs": [
-        {
-          "name": "MODEL",
-          "type": "MODEL",
-          "links": [
-            107
-          ],
-          "slot_index": 0,
-          "shape": 3
-        }
-      ],
-      "properties": {
-        "Node name for S&R": "UNETLoader"
-      },
-      "widgets_values": [
-        "flux1-dev.safetensors",
-        "fp8_e4m3fn"
-      ]
-    },
-    {
       "id": 10,
       "type": "VAELoader",
       "pos": [
@@ -693,7 +610,7 @@
         58
       ],
       "flags": {},
-      "order": 8,
+      "order": 7,
       "mode": 0,
       "inputs": [],
       "outputs": [
@@ -715,46 +632,6 @@
       ]
     },
     {
-      "id": 72,
-      "type": "LoraLoaderModelOnly",
-      "pos": [
-        419,
-        403
-      ],
-      "size": [
-        315,
-        82
-      ],
-      "flags": {},
-      "order": 11,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "model",
-          "type": "MODEL",
-          "link": 107
-        }
-      ],
-      "outputs": [
-        {
-          "name": "MODEL",
-          "type": "MODEL",
-          "links": [
-            106
-          ],
-          "slot_index": 0,
-          "shape": 3
-        }
-      ],
-      "properties": {
-        "Node name for S&R": "LoraLoaderModelOnly"
-      },
-      "widgets_values": [
-        "sevenof9_rj_v1.safetensors",
-        1
-      ]
-    },
-    {
       "id": 28,
       "type": "String Literal",
       "pos": [
@@ -766,7 +643,7 @@
         202.01535034179688
       ],
       "flags": {},
-      "order": 9,
+      "order": 8,
       "mode": 0,
       "inputs": [],
       "outputs": [
@@ -785,6 +662,147 @@
       },
       "widgets_values": [
         "Description"
+      ]
+    },
+    {
+      "id": 12,
+      "type": "UNETLoader",
+      "pos": [
+        18,
+        84
+      ],
+      "size": [
+        315,
+        82
+      ],
+      "flags": {},
+      "order": 9,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "MODEL",
+          "type": "MODEL",
+          "links": [
+            109
+          ],
+          "slot_index": 0,
+          "shape": 3
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "UNETLoader"
+      },
+      "widgets_values": [
+        "flux1-dev.safetensors",
+        "fp8_e4m3fn"
+      ]
+    },
+    {
+      "id": 6,
+      "type": "CLIPTextEncode",
+      "pos": [
+        424.71875,
+        618.052001953125
+      ],
+      "size": [
+        210,
+        54
+      ],
+      "flags": {
+        "collapsed": false
+      },
+      "order": 13,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "clip",
+          "type": "CLIP",
+          "link": 112
+        },
+        {
+          "name": "text",
+          "type": "STRING",
+          "link": 47,
+          "slot_index": 1,
+          "widget": {
+            "name": "text"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "name": "CONDITIONING",
+          "type": "CONDITIONING",
+          "links": [
+            86
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "CLIPTextEncode"
+      },
+      "widgets_values": [
+        ""
+      ]
+    },
+    {
+      "id": 73,
+      "type": "Lora Loader Stack (rgthree)",
+      "pos": [
+        412,
+        384.433349609375
+      ],
+      "size": [
+        340.20001220703125,
+        246
+      ],
+      "flags": {},
+      "order": 11,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "model",
+          "type": "MODEL",
+          "link": 109
+        },
+        {
+          "name": "clip",
+          "type": "CLIP",
+          "link": 111
+        }
+      ],
+      "outputs": [
+        {
+          "name": "MODEL",
+          "type": "MODEL",
+          "links": [
+            110
+          ],
+          "slot_index": 0
+        },
+        {
+          "name": "CLIP",
+          "type": "CLIP",
+          "links": [
+            112
+          ],
+          "slot_index": 1
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "Lora Loader Stack (rgthree)"
+      },
+      "widgets_values": [
+        "None",
+        1,
+        "None",
+        1,
+        "None",
+        1,
+        "None",
+        1
       ]
     }
   ],
@@ -926,25 +944,33 @@
       "INT"
     ],
     [
-      106,
-      72,
+      109,
+      12,
+      0,
+      73,
+      0,
+      "MODEL"
+    ],
+    [
+      110,
+      73,
       0,
       61,
       0,
       "MODEL"
     ],
     [
-      107,
-      12,
-      0,
-      72,
-      0,
-      "MODEL"
-    ],
-    [
-      108,
+      111,
       11,
       0,
+      73,
+      1,
+      "CLIP"
+    ],
+    [
+      112,
+      73,
+      1,
       6,
       0,
       "CLIP"
@@ -1022,10 +1048,17 @@
     "ds": {
       "scale": 1,
       "offset": [
-        205.26334402012105,
-        23.0334272570322
+        282,
+        86
       ]
-    }
+    },
+    "node_versions": {
+      "comfy-core": "v0.3.10-26-g8f29664",
+      "comfy-image-saver": "65e6903eff274a50f8b5cd768f0f96baf37baea1",
+      "rgthree-comfy": "5d771b8b56a343c24a26e8cea1f0c87c3d58102f"
+    },
+    "VHS_latentpreview": false,
+    "VHS_latentpreviewrate": 0
   },
   "version": 0.4
 }
