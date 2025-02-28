@@ -47,6 +47,7 @@ RUN pip install -r /stable-diffusion/custom_nodes/ComfyUI-HunyuanVideoWrapper/re
 RUN pip install -r /stable-diffusion/custom_nodes/efficiency-nodes-comfyui/requirements.txt
 RUN pip install -r /stable-diffusion/custom_nodes/rgthree-comfy/requirements.txt
 RUN pip install -r /stable-diffusion/custom_nodes/comfy-mtb/requirements.txt
+RUN pip install -r /stable-diffusion/custom_nodes/comfy-mtb/extern/GFPGAN/requirements.txt
 RUN pip install -r /stable-diffusion/custom_nodes/comfyui-florence2/requirements.txt
 RUN pip install -r /stable-diffusion/custom_nodes/comfyui-tensorops/requirements.txt
 

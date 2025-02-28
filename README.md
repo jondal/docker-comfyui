@@ -4,8 +4,13 @@
 
 # Terminal
 
+## Find
 * find . -name 'Comfy*'
 * find . -name 'LTXVideo*'
 * find . -name '*' -exec file {} \; | grep -o -P '^.+: \w+ image'
 * find . -cmin -5
 * find -type f -exec grep -lr "Stable Diffusion WebUI Docker" {} \;
+
+## Docker
+* docker ps -l
+* docker rm

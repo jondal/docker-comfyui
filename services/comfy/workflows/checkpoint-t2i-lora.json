@@ -99,7 +99,7 @@
         "Node name for S&R": "LoraLoader"
       },
       "widgets_values": [
-        "FootprintDS_r1.safetensors",
+        "r1.safetensors",
         1,
         1
       ]
