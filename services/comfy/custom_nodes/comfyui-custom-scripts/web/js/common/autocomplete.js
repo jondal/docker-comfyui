@@ -471,7 +471,7 @@ export class TextAreaAutoComplete {
 					this.#hide();
 					break;
 			}
-		} else if (e.key === "ArrowUp" || e.key === "ArrowDown" || e.key === "ArrowLeft" || e.key === "ArrowRight") {
+		} else if (e.key.length > 1 && e.key != "Delete" && e.key != "Backspace") {
 			return;
 		}
 		if (!e.defaultPrevented) {
@@ -536,9 +536,11 @@ export class TextAreaAutoComplete {
 	#update() {
 		let before = this.helper.getBeforeCursor();
 		if (before?.length) {
-			const m = before.match(/([^\s|,|;|"]+)$/);
+			const m = before.match(/([^,;"|{}()\n]+)$/);
 			if (m) {
-				before = m[0];
+				before = m[0]
+					.replace(/^\s+/, "")
+					.replace(/\s/g, "_") || null;
 			} else {
 				before = null;
 			}
@@ -611,24 +613,29 @@ export class TextAreaAutoComplete {
 			const item = $el(
 				"div.pysssss-autocomplete-item",
 				{
-					onclick: () => {
-						this.el.focus();
-						let value = wordInfo.value ?? wordInfo.text;
-						const use_replacer = wordInfo.use_replacer ?? true;
-						if (TextAreaAutoComplete.replacer && use_replacer) {
-							value = TextAreaAutoComplete.replacer(value);
-						}
-						this.helper.insertAtCursor(value + this.separator, -before.length, wordInfo.caretOffset);
-						setTimeout(() => {
-							this.#update();
-						}, 150);
-					},
-					onmousemove: () => {
-						this.#setSelected(wordInfo);
-					},
+				  onclick: () => {
+					this.el.focus();
+					let value = wordInfo.value ?? wordInfo.text;
+					const use_replacer = wordInfo.use_replacer ?? true;
+					if (TextAreaAutoComplete.replacer && use_replacer) {
+					  value = TextAreaAutoComplete.replacer(value);
+					}
+					value = this.#escapeParentheses(value);
+					
+					const afterCursor = this.helper.getAfterCursor();
+					const shouldAddSeparator = !afterCursor.trim().startsWith(this.separator.trim());
+					this.helper.insertAtCursor(
+					  value + (shouldAddSeparator ? this.separator : ''),
+					  -before.length,
+					  wordInfo.caretOffset
+					);			
+					setTimeout(() => {
+					  this.#update();
+					}, 150);
+				  },
 				},
 				parts
-			);
+			  );
 
 			if (wordInfo === this.selected) {
 				hasSelected = true;
@@ -652,6 +659,10 @@ export class TextAreaAutoComplete {
 		this.dropdown.style.top = (position.top ?? 0) + "px";
 		this.dropdown.style.maxHeight = (window.innerHeight - position.top) + "px";
 	}
+
+	#escapeParentheses(text) {
+		return text.replace(/\(/g, '\\(').replace(/\)/g, '\\)');
+	  }
 
 	#hide() {
 		this.selected = null;

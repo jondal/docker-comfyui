@@ -3,6 +3,15 @@ import math
 import random
 import operator as op
 
+# Hack: string type that is always equal in not equal comparisons
+class AnyType(str):
+    def __ne__(self, __value: object) -> bool:
+        return False
+
+
+# Our any instance wants to be a wildcard string
+any = AnyType("*")
+
 operators = {
     ast.Add: op.add,
     ast.Sub: op.sub,
@@ -19,6 +28,8 @@ operators = {
     ast.And: lambda a, b: 1 if a and b else 0,
     ast.Or: lambda a, b: 1 if a or b else 0,
     ast.Not: lambda a: 0 if a else 1,
+    ast.RShift: op.rshift,
+    ast.LShift: op.lshift
 }
 
 # TODO: restructure args to provide more info, generate hint based on args to save duplication
@@ -96,9 +107,9 @@ class MathExpression:
                 }}),
             },
             "optional": {
-                "a": ("INT,FLOAT,IMAGE,LATENT", ),
-                "b": ("INT,FLOAT,IMAGE,LATENT",),
-                "c": ("INT,FLOAT,IMAGE,LATENT", ),
+                "a": (any, ),
+                "b": (any,),
+                "c": (any, ),
             },
             "hidden": {"extra_pnginfo": "EXTRA_PNGINFO",
                        "prompt": "PROMPT"},
@@ -135,7 +146,10 @@ class MathExpression:
             values = prompt[str(node_id)]
             if "inputs" in values:
                 if widget_name in values["inputs"]:
-                    return values["inputs"][widget_name]
+                    value = values["inputs"][widget_name]
+                    if isinstance(value, list):
+                        raise ValueError("Converted widgets are not supported via named reference, use the inputs instead.")
+                    return value
             raise NameError(f"Widget not found: {node_name}.{widget_name}")
         raise NameError(f"Node not found: {node_name}.{widget_name}")
 
@@ -235,3 +249,4 @@ NODE_CLASS_MAPPINGS = {
 NODE_DISPLAY_NAME_MAPPINGS = {
     "MathExpression|pysssss": "Math Expression 🐍",
 }
+

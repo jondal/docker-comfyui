@@ -37,19 +37,19 @@ COPY workflows/*.json /stable-diffusion/user/default/workflows/
 
 # Custom nodes
 COPY ./custom_nodes/. /stable-diffusion/custom_nodes/
-RUN pip install -r /stable-diffusion/custom_nodes/ComfyUI-Manager/requirements.txt
 RUN pip install -r /stable-diffusion/custom_nodes/comfy-image-saver/requirements.txt
-RUN pip install -r /stable-diffusion/custom_nodes/ComfyUI-KJNodes/requirements.txt
-RUN pip install -r /stable-diffusion/custom_nodes/ComfyUI-CogVideoXWrapper/requirements.txt
-RUN pip install -r /stable-diffusion/custom_nodes/ComfyUI-LTXVideo/requirements.txt
-RUN pip install -r /stable-diffusion/custom_nodes/ComfyUI-VideoHelperSuite/requirements.txt
-RUN pip install -r /stable-diffusion/custom_nodes/ComfyUI-HunyuanVideoWrapper/requirements.txt
-RUN pip install -r /stable-diffusion/custom_nodes/efficiency-nodes-comfyui/requirements.txt
-RUN pip install -r /stable-diffusion/custom_nodes/rgthree-comfy/requirements.txt
 RUN pip install -r /stable-diffusion/custom_nodes/comfy-mtb/requirements.txt
 RUN pip install -r /stable-diffusion/custom_nodes/comfy-mtb/extern/GFPGAN/requirements.txt
+RUN pip install -r /stable-diffusion/custom_nodes/comfyui-cogvideoxwrapper/requirements.txt
 RUN pip install -r /stable-diffusion/custom_nodes/comfyui-florence2/requirements.txt
+RUN pip install -r /stable-diffusion/custom_nodes/comfyui-hunyuanvideowrapper/requirements.txt
+RUN pip install -r /stable-diffusion/custom_nodes/comfyui-kjnodes/requirements.txt
+RUN pip install -r /stable-diffusion/custom_nodes/ComfyUI-LTXVideo/requirements.txt
+RUN pip install -r /stable-diffusion/custom_nodes/comfyui-manager/requirements.txt
 RUN pip install -r /stable-diffusion/custom_nodes/comfyui-tensorops/requirements.txt
+RUN pip install -r /stable-diffusion/custom_nodes/comfyui-videohelpersuite/requirements.txt
+RUN pip install -r /stable-diffusion/custom_nodes/efficiency-nodes-comfyui/requirements.txt
+RUN pip install -r /stable-diffusion/custom_nodes/rgthree-comfy/requirements.txt
 
 # Custom Python stuff
 #RUN pip install GitPython

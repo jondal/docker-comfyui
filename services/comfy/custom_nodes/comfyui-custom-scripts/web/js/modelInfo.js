@@ -1,8 +1,17 @@
 import { app } from "../../../scripts/app.js";
+import { api } from "../../../scripts/api.js";
 import { $el } from "../../../scripts/ui.js";
 import { ModelInfoDialog } from "./common/modelInfoDialog.js";
 
 const MAX_TAGS = 500;
+const NsfwLevel = {
+	PG: 1,
+	PG13: 2,
+	R: 4,
+	X: 8,
+	XXX: 16,
+	Blocked: 32,
+};
 
 export class LoraInfoDialog extends ModelInfoDialog {
 	getTagFrequency() {
@@ -78,6 +87,9 @@ export class LoraInfoDialog extends ModelInfoDialog {
 
 	addTags() {
 		let tags = this.getTagFrequency();
+		if (!tags?.length) {
+			tags = this.metadata["modelspec.tags"]?.split(",").map((t) => [t.trim(), 1]);
+		}
 		let hasMore;
 		if (tags?.length) {
 			const c = tags.length;
@@ -109,6 +121,45 @@ export class LoraInfoDialog extends ModelInfoDialog {
 		}
 	}
 
+	addExample(title, value, name) {
+		const textArea = $el("textarea", {
+			textContent: value,
+			style: {
+				whiteSpace: "pre-wrap",
+				margin: "10px 0",
+				color: "#fff",
+				background: "#222",
+				padding: "5px",
+				borderRadius: "5px",
+				maxHeight: "250px",
+				overflow: "auto",
+				display: "block",
+				border: "none",
+				width: "calc(100% - 10px)",
+			},
+		});
+		$el(
+			"p",
+			{
+				parent: this.content,
+				textContent: `${title}: `,
+			},
+			[
+				textArea,
+				$el("button", {
+					onclick: async () => {
+						await this.saveAsExample(textArea.value, `${name}.txt`);
+					},
+					textContent: "Save as Example",
+					style: {
+						fontSize: "14px",
+					},
+				}),
+				$el("hr"),
+			]
+		);
+	}
+
 	async addInfo() {
 		this.addInfoEntry("Name", this.metadata.ss_output_name || "⚠️ Unknown");
 		this.addInfoEntry("Base Model", this.metadata.ss_sd_model_name || "⚠️ Unknown");
@@ -127,49 +178,61 @@ export class LoraInfoDialog extends ModelInfoDialog {
 		this.addTags();
 
 		const info = await p;
-		if (info) {
-			$el(
-				"p",
-				{
-					parent: this.content,
-					textContent: "Trained Words: ",
-				},
-				[
-					$el("pre", {
-						textContent: info.trainedWords.join(", "),
-						style: {
-							whiteSpace: "pre-wrap",
-							margin: "10px 0",
-							background: "#222",
-							padding: "5px",
-							borderRadius: "5px",
-							maxHeight: "250px",
-							overflow: "auto",
-						},
-					}),
-				]
-			);
-			$el("div", {
-				parent: this.content,
-				innerHTML: info.description,
-				style: {
-					maxHeight: "250px",
-					overflow: "auto",
+		this.addExample("Trained Words", info?.trainedWords?.join(", ") ?? "", "trainedwords");
+
+		const triggerPhrase = this.metadata["modelspec.trigger_phrase"];
+		if (triggerPhrase) {
+			this.addExample("Trigger Phrase", triggerPhrase, "triggerphrase");
+		}
+
+		$el("div", {
+			parent: this.content,
+			innerHTML: info?.description ?? this.metadata["modelspec.description"] ?? "[No description provided]",
+			style: {
+				maxHeight: "250px",
+				overflow: "auto",
+			},
+		});
+	}
+
+	async saveAsExample(example, name = "example.txt") {
+		if (!example.length) {
+			return;
+		}
+		try {
+			name = prompt("Enter example name", name);
+			if (!name) return;
+
+			await api.fetchApi("/pysssss/examples/" + encodeURIComponent(`${this.type}/${this.name}`), {
+				method: "POST",
+				body: JSON.stringify({
+					name,
+					example,
+				}),
+				headers: {
+					"content-type": "application/json",
 				},
 			});
+			this.node?.["pysssss.updateExamples"]?.();
+			alert("Saved!");
+		} catch (error) {
+			console.error(error);
+			alert("Error saving: " + error);
 		}
 	}
 
 	createButtons() {
 		const btns = super.createButtons();
-
+		function tagsToCsv(tags) {
+			return tags.map((el) => el.dataset.tag).join(", ");
+		}
 		function copyTags(e, tags) {
 			const textarea = $el("textarea", {
 				parent: document.body,
 				style: {
 					position: "fixed",
 				},
-				textContent: tags.map((el) => el.dataset.tag).join(", "),
+				textContent: tagsToCsv(tags),
 			});
 			textarea.select();
 			try {
@@ -189,6 +252,14 @@ export class LoraInfoDialog extends ModelInfoDialog {
 		}
 
 		btns.unshift(
+			$el("button", {
+				type: "button",
+				textContent: "Save Selected as Example",
+				onclick: async (e) => {
+					const tags = tagsToCsv([...this.tags.querySelectorAll(".pysssss-model-tag--selected")]);
+					await this.saveAsExample(tags);
+				},
+			}),
 			$el("button", {
 				type: "button",
 				textContent: "Copy Selected",
@@ -230,27 +301,28 @@ class CheckpointInfoDialog extends ModelInfoDialog {
 
 const lookups = {};
 
-function addInfoOption(node, typeName, type, infoClass, widgetName, opts, useValue) {
-	let value = node.widgets.find((w) => w.name === widgetName)?.value;
-	if (value?.content) {
-		value = value.content;
-	}
-	if (!value) {
-		return;
-	}
-	let optName;
-	if (useValue) {
-		const split = value.split(/\.|\\|\//);
+function addInfoOption(node, type, infoClass, widgetNamePattern, opts) {
+	const widgets = widgetNamePattern
+		? node.widgets.filter((w) => w.name === widgetNamePattern || w.name.match(`^${widgetNamePattern}$`))
+		: [node.widgets[0]];
+	for (const widget of widgets) {
+		let value = widget.value;
+		if (value?.content) {
+			value = value.content;
+		}
+		if (!value || value === "None") {
+			return;
+		}
+		let optName;
+		const split = value.split(/[.\\/]/);
 		optName = split[split.length - 2];
-	} else {
-		optName = `View ${typeName} info...`;
+		opts.push({
+			content: optName,
+			callback: async () => {
+				new infoClass(value, node).show(type, value);
+			},
+		});
 	}
-	opts.unshift({
-		content: optName,
-		callback: async () => {
-			new infoClass(value).show(type, value);
-		},
-	});
 }
 
 function addTypeOptions(node, typeName, options) {
@@ -260,22 +332,25 @@ function addTypeOptions(node, typeName, options) {
 
 	const widgets = Object.keys(values);
 	const cls = type === "loras" ? LoraInfoDialog : CheckpointInfoDialog;
-	if (widgets.length === 1) {
-		addInfoOption(node, typeName, type, cls, widgets[0] || node.widgets[0].name, options);
+
+	const opts = [];
+	for (const w of widgets) {
+		addInfoOption(node, type, cls, w, opts);
+	}
+
+	if (!opts.length) return;
+
+	if (opts.length === 1) {
+		opts[0].content = `View ${typeName} info...`;
+		options.unshift(opts[0]);
 	} else {
-		const opts = [];
-		for (const w of widgets) {
-			addInfoOption(node, typeName, type, cls, w, opts, true);
-		}
-		if (opts.length) {
-			options.unshift({
-				title: `View ${typeName} info...`,
-				has_submenu: true,
-				submenu: {
-					options: opts,
-				},
-			});
-		}
+		options.unshift({
+			title: `View ${typeName} info...`,
+			has_submenu: true,
+			submenu: {
+				options: opts,
+			},
+		});
 	}
 }
 
@@ -288,10 +363,12 @@ app.registerExtension({
 				name: `🐍 Model Info - ${type} Nodes/Widgets`,
 				type: "text",
 				defaultValue,
-				tooltip: `Comma separated list of NodeTypeName or NodeTypeName.WidgetName that contain ${type} node names that should have the View Info option available.\nIf no widget name is specifed the first widget will be used.`,
+				tooltip: `Comma separated list of NodeTypeName or NodeTypeName.WidgetName that contain ${type} node names that should have the View Info option available.\nIf no widget name is specifed the first widget will be used. Regex matches (e.g. NodeName..*lora_\\d+) are supported in the widget name.`,
 				onChange(value) {
 					lookups[type] = value.split(",").reduce((p, n) => {
-						const split = n.trim().split(".");
+						n = n.trim();
+						const pos = n.indexOf(".");
+						const split = pos === -1 ? [n] : [n.substring(0, pos), n.substring(pos + 1)];
 						p[split[0]] ??= {};
 						p[split[0]][split[1] ?? ""] = true;
 						return p;
@@ -299,12 +376,26 @@ app.registerExtension({
 				},
 			});
 		};
-		addSetting("Lora", ["LoraLoader.lora_name", "LoraLoader|pysssss", "LoraLoaderModelOnly.lora_name"].join(","));
+		addSetting(
+			"Lora",
+			["LoraLoader.lora_name", "LoraLoader|pysssss", "LoraLoaderModelOnly.lora_name", "LoRA Stacker.lora_name.*"].join(",")
+		);
 		addSetting(
 			"Checkpoint",
 			["CheckpointLoader.ckpt_name", "CheckpointLoaderSimple", "CheckpointLoader|pysssss", "Efficient Loader", "Eff. Loader SDXL"].join(",")
 		);
-		console.log(lookups);
+
+		app.ui.settings.addSetting({
+			id: `pysssss.ModelInfo.NsfwLevel`,
+			name: `🐍 Model Info - Image Preview Max NSFW Level`,
+			type: "combo",
+			defaultValue: "PG13",
+			options: Object.keys(NsfwLevel),
+			tooltip: `Hides preview images that are tagged as a higher NSFW level`,
+			onChange(value) {
+				ModelInfoDialog.nsfwLevel = NsfwLevel[value] ?? NsfwLevel.PG;
+			},
+		});
 	},
 	beforeRegisterNodeDef(nodeType) {
 		const getExtraMenuOptions = nodeType.prototype.getExtraMenuOptions;

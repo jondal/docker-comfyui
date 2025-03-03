@@ -179,7 +179,7 @@
         "Node name for S&R": "CheckpointLoaderSimple"
       },
       "widgets_values": [
-        "rp_v8.safetensors"
+        "rp_v85.safetensors"
       ]
     },
     {

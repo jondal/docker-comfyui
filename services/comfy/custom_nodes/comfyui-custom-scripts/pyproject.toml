@@ -1,8 +1,8 @@
 [project]
 name = "comfyui-custom-scripts"
 description = "Enhancements & experiments for ComfyUI, mostly focusing on UI features"
-version = "1.0.0"
-license = "LICENSE"
+version = "1.1.1"
+license = { file = "LICENSE" }
 
 [project.urls]
 Repository = "https://github.com/pythongosssss/ComfyUI-Custom-Scripts"

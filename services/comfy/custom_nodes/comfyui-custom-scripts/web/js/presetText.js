@@ -5,6 +5,7 @@ import { app } from "../../../scripts/app.js";
 
 let replaceRegex;
 const id = "pysssss.PresetText.Presets";
+const MISSING = Symbol();
 
 const getPresets = () => {
 	let items;
@@ -47,10 +48,25 @@ app.registerExtension({
 				}
 			},
 		});
+
+		const drawNodeWidgets = LGraphCanvas.prototype.drawNodeWidgets
+		LGraphCanvas.prototype.drawNodeWidgets = function(node) {
+			const c = LiteGraph.WIDGET_BGCOLOR;
+			try {
+				if(node[MISSING]) {
+					LiteGraph.WIDGET_BGCOLOR = "red"
+				}
+				return drawNodeWidgets.apply(this, arguments);
+			} finally {
+				LiteGraph.WIDGET_BGCOLOR = c;
+			}
+		}
 	},
 	registerCustomNodes() {
-		class PresetTextNode {
+		class PresetTextNode extends LiteGraph.LGraphNode {
 			constructor() {
+				super();
+				this.title = "Preset Text 🐍";
 				this.isVirtualNode = true;
 				this.serialize_widgets = true;
 				this.addOutput("text", "STRING");
@@ -153,10 +169,12 @@ app.registerExtension({
 								if (!w) continue;
 								const preset = presets.find((p) => p.name === widget.value);
 								if (!preset) {
+									this[MISSING] = true;
+									app.graph.setDirtyCanvas(true, true);
 									const msg = `Preset text '${widget.value}' not found. Please fix this and queue again.`;
-									alert(msg);
 									throw new Error(msg);
 								}
+								delete this[MISSING];
 								w.value = preset.value;
 							}
 						}

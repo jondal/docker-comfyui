@@ -1,9 +1,9 @@
-requirements.txt
 .gitattributes
-LICENSE
+.github/workflows/publish.yaml
 .gitignore
+LICENSE
+README.md
+__init__.py
 nodes.py
 pyproject.toml
-__init__.py
-README.md
-.github/workflows/publish.yaml
+requirements.txt

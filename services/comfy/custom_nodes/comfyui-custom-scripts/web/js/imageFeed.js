@@ -37,6 +37,9 @@ $el("style", {
 		min-width: 200px;
 		max-width: calc(var(--max-size, 10) * 1vw);
 	}
+	.comfyui-body-left .pysssss-image-feed--left, .comfyui-body-right .pysssss-image-feed--right {
+		height: 100%;
+	}
 	.pysssss-image-feed--left {
 		left: 0;
 	}
@@ -229,6 +232,7 @@ app.registerExtension({
 				content: "Show Image Feed 🐍",
 			});
 			showMenuButton.enabled = false;
+			showMenuButton.element.style.display = "none";
 			app.menu.settingsGroup.append(showMenuButton);
 		}
 
@@ -249,7 +253,9 @@ app.registerExtension({
 
 		function updateMenuParent(location) {
 			if (showMenuButton) {
-				document.querySelector(".comfyui-body-" + location).append(imageFeed);
+				const el = document.querySelector(".comfyui-body-" + location);
+				if (!el) return;
+				el.append(imageFeed);
 			} else {
 				if (!imageFeed.parent) {
 					document.body.append(imageFeed);
@@ -279,10 +285,11 @@ app.registerExtension({
 									feedLocation.value = e.target.value;
 									imageFeed.className = `pysssss-image-feed pysssss-image-feed--${feedLocation.value}`;
 									updateMenuParent(feedLocation.value);
-									window.dispatchEvent(new Event("resize"));
+									saveVal("Location", feedLocation.value);
+									window.dispatchEvent(new Event("resize"));									
 								},
 							},
-							["left", "top", "right", "bottom"].map((m) =>
+							["left", "top", "right", "bottom", "hidden"].map((m) =>
 								$el("option", {
 									value: m,
 									textContent: m,
@@ -294,8 +301,20 @@ app.registerExtension({
 				]);
 			},
 			onChange(value) {
-				imageFeed.className = `pysssss-image-feed pysssss-image-feed--${value}`;
-				updateMenuParent(value);
+				if (value === "hidden") {
+					imageFeed.remove();
+					if (showMenuButton) {
+						requestAnimationFrame(() => {
+							showMenuButton.element.style.display = "none";
+						});
+					}
+					showButton.style.display = "none";
+				} else {
+					showMenuButton.element.style.display = "unset";
+					showButton.style.display = visible ? "none" : "unset";
+					imageFeed.className = `pysssss-image-feed pysssss-image-feed--${value}`;
+					updateMenuParent(value);
+				}
 			},
 		});
 
@@ -356,6 +375,14 @@ Recommended: "enabled (max performance)" uness images are erroneously deduplicat
 			},
 		});
 
+		const maxImages = app.ui.settings.addSetting({
+			id: "pysssss.ImageFeed.MaxImages",
+			name: "🐍 Image Feed Max Images",
+			tooltip: `Limits the number of images in the feed to a maximum, removing the oldest images as new ones are added.`,
+			defaultValue: 0,
+			type: "number",
+		});
+
 		const clearButton = $el("button.pysssss-image-feed-btn.clear-btn", {
 			textContent: "Clear",
 			onclick: () => {
@@ -368,8 +395,11 @@ Recommended: "enabled (max performance)" uness images are erroneously deduplicat
 			textContent: "❌",
 			onclick: () => {
 				imageFeed.style.display = "none";
-				showButton.style.display = "unset";
-				if (showMenuButton) showMenuButton.enabled = true;
+				showButton.style.display = feedLocation.value === "hidden" ? "none" : "unset";
+				if (showMenuButton) {
+					showMenuButton.enabled = true;
+					showMenuButton.element.style.display = "";
+				}
 				saveVal("Visible", 0);
 				visible = false;
 				window.dispatchEvent(new Event("resize"));
@@ -388,6 +418,11 @@ Recommended: "enabled (max performance)" uness images are erroneously deduplicat
 
 		function addImageToFeed(href) {
 			const method = feedDirection.value === "newest first" ? "prepend" : "append";
+
+			if (maxImages.value > 0 && imageList.children.length >= maxImages.value) {
+				imageList.children[method === "prepend" ? imageList.children.length - 1 : 0].remove();
+			}
+
 			imageList[method](
 				$el("div", [
 					$el(
@@ -475,7 +510,10 @@ Recommended: "enabled (max performance)" uness images are erroneously deduplicat
 		showButton.onclick = () => {
 			imageFeed.style.display = "flex";
 			showButton.style.display = "none";
-			if (showMenuButton) showMenuButton.enabled = false;
+			if (showMenuButton) {
+				showMenuButton.enabled = false;
+				showMenuButton.element.style.display = "none";
+			}
 
 			saveVal("Visible", 1);
 			visible = true;

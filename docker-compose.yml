@@ -11,19 +11,42 @@ x-base_service: &base_service
       - type: tmpfs
         target: /stable-diffusion/temp
         tmpfs:
-          size: "12884901888"
+          size: "1g"
       - type: tmpfs
         target: /stable-diffusion/input
         tmpfs:
-          size: "12884901888"
+          size: "1g"
       - type: tmpfs
         target: /stable-diffusion/output
         tmpfs:
-          size: "12884901888"
+          size: "1g"
+      - type: tmpfs
+        target: /tmp
+        tmpfs:
+          size: "1g"
+      - type: tmpfs
+        target: /var/tmp
+        tmpfs:
+          size: "1g"
+      - type: tmpfs
+        target: /run
+        tmpfs:
+          size: "1g"
       #- &v2 ./output:/output
     stop_signal: SIGKILL
     tty: true
+    restart: "no"
+    #networks:
+    #  - isolated
+    #read_only: true
+    user: "1000:1000"
+    cap_drop:
+      - ALL
+    cap_add:
+      - NET_BIND_SERVICE
     deploy:
+      restart_policy:
+        condition: none
       resources:
         reservations:
           devices:
@@ -34,6 +57,10 @@ x-base_service: &base_service
                 #capabilities: [compute, utility]
 
 name: webui-docker
+#networks:
+#  isolated:
+#    driver: bridge
+#    internal: true
 
 services:
   # download:

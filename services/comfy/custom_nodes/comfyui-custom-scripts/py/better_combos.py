@@ -37,10 +37,11 @@ async def save_preview(request):
     subfolder = body.get("subfolder", "")
     full_output_folder = os.path.join(dir, os.path.normpath(subfolder))
 
-    if os.path.commonpath((dir, os.path.abspath(full_output_folder))) != dir:
+    filepath = os.path.join(full_output_folder, body.get("filename", ""))
+
+    if os.path.commonpath((dir, os.path.abspath(filepath))) != dir:
         return web.Response(status=400)
 
-    filepath = os.path.join(full_output_folder, body.get("filename", ""))
     image_path = folder_paths.get_full_path(type, name)
     image_path = os.path.splitext(
         image_path)[0] + os.path.splitext(filepath)[1]
@@ -66,11 +67,42 @@ async def get_examples(request):
     
     file_path_no_ext = os.path.splitext(file_path)[0]
     examples = []
+
     if os.path.isdir(file_path_no_ext):
-        examples += map(lambda t: os.path.relpath(t, file_path_no_ext),
-                        glob.glob(file_path_no_ext + "/*.txt"))
+        examples += sorted(map(lambda t: os.path.relpath(t, file_path_no_ext),
+                        glob.glob(file_path_no_ext + "/*.txt")))
+        
+    if os.path.isfile(file_path_no_ext + ".txt"):
+        examples += ["notes"]
    
     return web.json_response(examples)
+
+@PromptServer.instance.routes.post("/pysssss/examples/{name}")
+async def save_example(request):
+    name = request.match_info["name"]
+    pos = name.index("/")
+    type = name[0:pos]
+    name = name[pos+1:]
+    body = await request.json()
+    example_name = body["name"]
+    example = body["example"]
+
+    file_path = folder_paths.get_full_path(
+        type, name)
+    if not file_path:
+        return web.Response(status=404)
+    
+    if not example_name.endswith(".txt"):
+        example_name += ".txt"
+
+    file_path_no_ext = os.path.splitext(file_path)[0]
+    example_file = os.path.join(file_path_no_ext, example_name)
+    if not os.path.exists(file_path_no_ext):
+        os.mkdir(file_path_no_ext)
+    with open(example_file, 'w', encoding='utf8') as f:
+        f.write(example)
+
+    return web.Response(status=201)
 
 
 def populate_items(names, type):
@@ -99,29 +131,59 @@ def populate_items(names, type):
 
 
 class LoraLoaderWithImages(LoraLoader):
+    RETURN_TYPES = (*LoraLoader.RETURN_TYPES, "STRING",)
+
     @classmethod
     def INPUT_TYPES(s):
         types = super().INPUT_TYPES()
         names = types["required"]["lora_name"][0]
         populate_items(names, "loras")
+        types["optional"] = { "prompt": ("HIDDEN",) }
         return types
+
+    @classmethod
+    def VALIDATE_INPUTS(s, lora_name):
+        types = super().INPUT_TYPES()
+        names = types["required"]["lora_name"][0]
+
+        name = lora_name["content"]
+        if name in names:
+            return True
+        else:
+            return f"Lora not found: {name}"
 
     def load_lora(self, **kwargs):
         kwargs["lora_name"] = kwargs["lora_name"]["content"]
-        return super().load_lora(**kwargs)
+        prompt = kwargs.pop("prompt", "")
+        return (*super().load_lora(**kwargs), prompt)
 
 
 class CheckpointLoaderSimpleWithImages(CheckpointLoaderSimple):
+    RETURN_TYPES = (*CheckpointLoaderSimple.RETURN_TYPES, "STRING",)
+    
     @classmethod
     def INPUT_TYPES(s):
         types = super().INPUT_TYPES()
         names = types["required"]["ckpt_name"][0]
         populate_items(names, "checkpoints")
+        types["optional"] = { "prompt": ("HIDDEN",) }
         return types
+
+    @classmethod
+    def VALIDATE_INPUTS(s, ckpt_name):
+        types = super().INPUT_TYPES()
+        names = types["required"]["ckpt_name"][0]
+
+        name = ckpt_name["content"]
+        if name in names:
+            return True
+        else:
+            return f"Checkpoint not found: {name}"
 
     def load_checkpoint(self, **kwargs):
         kwargs["ckpt_name"] = kwargs["ckpt_name"]["content"]
-        return super().load_checkpoint(**kwargs)
+        prompt = kwargs.pop("prompt", "")
+        return (*super().load_checkpoint(**kwargs), prompt)
 
 
 NODE_CLASS_MAPPINGS = {
