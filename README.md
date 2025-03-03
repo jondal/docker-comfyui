@@ -7,6 +7,7 @@
 * python venv
 * pip
 * docker
+* veracrypt
 * vscode
 * comfyui
   - manager
