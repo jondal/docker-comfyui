@@ -6,6 +6,8 @@ x-base_service: &base_service
       - &v1 ./data:/data:ro
       - &v2 ./data/models/clip/clip-vit-large-patch14:/stable-diffusion/models/clip/clip-vit-large-patch14:ro
       - &v3 ./data/models/LLM:/stable-diffusion/models/LLM:ro
+      - &v4 /media/veracrypt1/checkpoints:/stable-diffusion/models/checkpoints:ro
+      - &v5 /media/veracrypt1/loras:/stable-diffusion/models/loras:ro
       #- &v3 ./data/models/LLM/llava-llama-3-8b-text-encoder-tokenizer:/stable-diffusion/models/LLM/llava-llama-3-8b-text-encoder-tokenizer:ro
       # temp fs
       - type: tmpfs
