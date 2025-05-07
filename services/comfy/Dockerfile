@@ -41,6 +41,7 @@ RUN pip install -r /stable-diffusion/custom_nodes/comfy-image-saver/requirements
 RUN pip install -r /stable-diffusion/custom_nodes/comfy-mtb/requirements.txt
 RUN pip install -r /stable-diffusion/custom_nodes/comfy-mtb/extern/GFPGAN/requirements.txt
 RUN pip install -r /stable-diffusion/custom_nodes/comfyui-cogvideoxwrapper/requirements.txt
+RUN pip install -r /stable-diffusion/custom_nodes/comfyui-custom-scripts/requirements.txt
 RUN pip install -r /stable-diffusion/custom_nodes/comfyui-florence2/requirements.txt
 RUN pip install -r /stable-diffusion/custom_nodes/comfyui-hunyuanvideowrapper/requirements.txt
 RUN pip install -r /stable-diffusion/custom_nodes/comfyui-kjnodes/requirements.txt
